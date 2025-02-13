@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -11,8 +12,9 @@ import (
 )
 
 func run() int {
-	// hardcoded trial URL
-	url := "https://www.lazyvim.org/keymaps"
+	flag.Parse()
+	args := flag.Args()
+	url := args[0]
 
 	// Initialize Colly collector
 	c := colly.NewCollector()
