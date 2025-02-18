@@ -1,20 +1,13 @@
-package main
+package scraper
 
 import (
-	"flag"
 	"fmt"
-	"log"
-	"os"
 )
 
-func run() int {
-	flag.Parse()
-	args := flag.Args()
-	url := args[0]
-
+func Scrape(url string) error {
 	tables, err := ScrapeTables(url)
 	if err != nil {
-		log.Fatalf("Failed to visit URL: %v", err)
+		return fmt.Errorf("failed to visit URL: %v", err)
 	}
 
 	// Print all tables
@@ -24,10 +17,5 @@ func run() int {
 		fmt.Println("---") // Separator between tables
 	}
 
-	return 0
-}
-
-func main() {
-	output := run()
-	os.Exit(output)
+	return nil
 }
