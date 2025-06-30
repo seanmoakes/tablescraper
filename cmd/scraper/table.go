@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"strings"
 	"unicode"
@@ -230,4 +231,97 @@ func (t *Table) ToJSON() []map[string]string {
 	}
 
 	return jsonData
+}
+
+func (t *Table) PrintHTML(w io.Writer) error {
+	if len(t.Rows) == 0 {
+		_, err := fmt.Fprintln(w, "<!-- Empty table -->")
+		return err
+	}
+
+	// Write HTML header with basic CSS
+	_, err := fmt.Fprintf(w, `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%%;
+            margin: 1em 0;
+            font-family: sans-serif;
+        }
+        th, td {
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+`)
+	if err != nil {
+		return err
+	}
+
+	// Start table with semantic markup
+	if _, err := fmt.Fprintln(w, "<table>"); err != nil {
+		return err
+	}
+
+	// Header row in <thead>
+	if _, err := fmt.Fprintln(w, "    <thead>"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprint(w, "        <tr>"); err != nil {
+		return err
+	}
+	for _, cell := range t.Rows[0] {
+		if _, err := fmt.Fprintf(w, "\n            <th>%s</th>", html.EscapeString(cell)); err != nil {
+			return err
+		}
+	}
+	if _, err := fmt.Fprintln(w, "\n        </tr>"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintln(w, "    </thead>"); err != nil {
+		return err
+	}
+
+	// Data rows in <tbody>
+	if _, err := fmt.Fprintln(w, "    <tbody>"); err != nil {
+		return err
+	}
+	for _, row := range t.Rows[1:] {
+		if _, err := fmt.Fprint(w, "        <tr>"); err != nil {
+			return err
+		}
+		for _, cell := range row {
+			if _, err := fmt.Fprintf(w, "\n            <td>%s</td>", html.EscapeString(cell)); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintln(w, "\n        </tr>"); err != nil {
+			return err
+		}
+	}
+	if _, err := fmt.Fprintln(w, "    </tbody>"); err != nil {
+		return err
+	}
+
+	// Close table and document
+	if _, err := fmt.Fprintln(w, "</table>"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintln(w, "</body>\n</html>"); err != nil {
+		return err
+	}
+
+	return nil
 }

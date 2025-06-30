@@ -41,7 +41,7 @@ var ScrapeCmd = &cobra.Command{
 func init() {
 	ScrapeCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "Explain what is happenning at every step of the scraping process.")
 	ScrapeCmd.Flags().StringVarP(&outputFile, "output", "o", "", "Write to the given filepath")
-	ScrapeCmd.Flags().StringVarP(&format, "format", "f", "table", "Output tables in the given format, valid options are table, csv, json, and markdown")
+	ScrapeCmd.Flags().StringVarP(&format, "format", "f", "table", "Output tables in the given format, valid options are table, csv, json, markdown and html")
 }
 
 func Scrape(url string) error {
@@ -76,6 +76,8 @@ func Scrape(url string) error {
 				table.PrintCSV(writer)
 			case "json":
 				table.PrintJSON(writer)
+			case "html":
+				table.PrintHTML(writer)
 			default:
 				log.Fatalf("Unsupported format: %s", format)
 			}
