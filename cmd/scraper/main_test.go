@@ -1,8 +1,10 @@
 package scraper
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -54,9 +56,10 @@ func TestPrint(t *testing.T) {
 	table := NewTable()
 	table.AddRow([]string{"Name", "Age", "Occupation"})
 	table.AddRow([]string{"John Doe", "28", "Software Engineer"})
+	var writer io.Writer = os.Stdout // Default to stdout
 
 	// Simply call Print and ensure it doesn't panic
-	table.Print()
+	table.Print(writer)
 }
 
 func TestScrapeTables(t *testing.T) {
